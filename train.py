@@ -33,13 +33,12 @@ def main():
         rc.fit( X_train, y_train )
 
     accuracies = cross_val_score( estimator=rc, X=X_train, y=y_train, cv=10 )
-    print( "accuracy is {:.2f} %".format( accuracies.mean() * 100 ) )
+    print( "accuracy on train set is  {:.2f} %".format( accuracies.mean() * 100 ) )
     print( "std is {:.2f} %".format( accuracies.std() * 100 ) )
-    pre6 = rc.predict( X_test )
-    Random_forest = accuracy_score( pre6, y_test )
-    print( accuracy_score( pre6, y_test ) )
-    print( confusion_matrix( pre6, y_test ) )
-    print( classification_report( pre6, y_test ) )
+    rf_predict = rc.predict( X_test )
+    print( "accuracy on test set is  {:.2f} %".format( accuracy_score( rf_predict, y_test )  * 100 ) )
+    print( confusion_matrix( rf_predict, y_test ) )
+    print( classification_report( rf_predict, y_test ) )
     filename = 'model.sav'
     joblib.dump( rc, filename )
 
