@@ -18,7 +18,7 @@ def encoder(var):
 def main():
     model = joblib.load( 'model.sav' )
     df = pd.read_csv('top_features.csv')
-    Polydipsia = st.radio( label="Have you recently observed a feeling of extreme thirstiness?", options=["Yes", "No"] )
+    Polydipsia = st.radio( label="Have you recently observed a feeling of extreme thirstiness?", options=["Yes", "No"])
     Polydipsia = encoder(Polydipsia)
     Polyuria = st.radio( label="Have you been using bathroom more frequently than before?", options=["Yes", "No"] )
     Polyuria = encoder(Polyuria)
@@ -30,21 +30,20 @@ def main():
     Gender = encoder(Gender)
     arr = [Polydipsia, Polyuria, weight_loss, partial_paresis, Gender]
     result = model.predict([arr])
-    if result[0] == 1:
-        st.subheader('You have symptoms of early stage of diabetes-mellitus. Consult a qualified professional for further '
-                 'details.')
-    else:
-        st.subheader('You do not have any early stage symptoms of diabetes-mellitus.')
-
-    # arr = np.array(arr)
-    # if radio == "Yes":
-    #
-    #     st.write('In Yes')
-    # elif radio == "No":
-    #     st.write('IN No')
-    # result = model.predict()
-    # print( result )
+    if st.button('Predict'):
+        if result[0] == 1:
+            st.error(
+                'You have symptoms of early stage of diabetes-mellitus. Consult a qualified professional for further '
+                'details.' )
+        else:
+            st.success( 'You do not have any early stage symptoms of diabetes-mellitus.' )
 
 if __name__ == '__main__':
     st.title('Predict early stage diabetes-mellitus.')
+    st.sidebar.markdown('Using a random forest classifier on UCI Early stage diabetes risk prediction dataset.')
+
+    if st.sidebar.button("About") == False:
+        st.sidebar.text( "kaustubh.shirpurkar@gmail.com " )
+        st.sidebar.text( "By Kaustubh Shirpurkar" )
+        st.sidebar.text( "Built with Streamlit" )
     main()
