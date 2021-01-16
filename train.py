@@ -29,7 +29,7 @@ def main(train=False):
         df_new.to_csv( 'train_df.csv', index=False )
         X = df_new[
             featurescores.nlargest( top_features,
-                                    'scores' ).column.values.tolist()]  # only using top 10 factors prediction
+                                    'scores' ).column.values.tolist()]  # only using top 5 factors prediction
         y = df_new['class']
         X_train, X_test, y_train, y_test = train_test_split( X, y, test_size=0.2, random_state=0 )
         ss = StandardScaler()
