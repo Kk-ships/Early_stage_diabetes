@@ -1,5 +1,7 @@
 import streamlit as st
 import joblib
+
+
 def encoder(var):
     if var == 'Yes' or var == 'Male':
         return 1
