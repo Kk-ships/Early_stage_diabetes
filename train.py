@@ -1,56 +1,84 @@
-import pandas as pd
-from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
-from sklearn import preprocessing
-from sklearn.feature_selection import SelectKBest, chi2
-from sklearn.model_selection import train_test_split, cross_val_score
-from sklearn.preprocessing import StandardScaler
-from sklearn.ensemble import RandomForestClassifier
 import joblib
+import pandas as pd
+from sklearn.compose import ColumnTransformer
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report
+from sklearn.model_selection import train_test_split
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
 
 
-def main(train=False):
+def main(train=False, classifier = None):
     if train:
         df = pd.read_csv( 'diabetes_data.csv' )
-        le = preprocessing.LabelEncoder()
-        df_new = df.drop( columns=['Age'] )
-        df_new = df_new.apply( le.fit_transform )
-        df_new['Age'] = df['Age']
-        X1 = df_new.drop( columns=['class'] )
-        y1 = df_new['class']
-
-        best_feature = SelectKBest( score_func=chi2, k=10 )
-        fit = best_feature.fit( X1, y1 )
-        dataset_scores = pd.DataFrame( fit.scores_ )
-        dataset_cols = pd.DataFrame( X1.columns )
-        featurescores = pd.concat( [dataset_cols, dataset_scores], axis=1 )
-        featurescores.columns = ['column', 'scores']
-        top_features = 5
-        featurescores.nlargest( top_features, 'scores' ).to_csv( 'top_features.csv', index=False)
-        df_new.to_csv( 'train_df.csv', index=False )
-        X = df_new[
-            featurescores.nlargest( top_features,
-                                    'scores' ).column.values.tolist()]  # only using top 5 factors prediction
-        y = df_new['class']
-        X_train, X_test, y_train, y_test = train_test_split( X, y, test_size=0.2, random_state=0 )
-        ss = StandardScaler()
-        X_train = ss.fit_transform( X_train )
-        X_test = ss.transform( X_test )
-        for i in range( 1, 100 ):
-            rc = RandomForestClassifier( n_estimators=i, criterion='entropy', random_state=0, n_jobs=-1 )
-            rc.fit( X_train, y_train )
-
-        accuracies = cross_val_score( estimator=rc, X=X_train, y=y_train, cv=10 )
-        print( "accuracy on train set is  {:.2f} %".format( accuracies.mean() * 100 ) )
-        print( "std is {:.2f} %".format( accuracies.std() * 100 ) )
-        rf_predict = rc.predict( X_test )
-        print( "accuracy on test set is  {:.2f} %".format( accuracy_score( rf_predict, y_test ) * 100 ) )
-        print( confusion_matrix( rf_predict, y_test ) )
-        print( classification_report( rf_predict, y_test ) )
-        filename = 'model.sav'
-        joblib.dump( rc, filename )
+        df = df[['Polydipsia', 'Polyuria', 'sudden weight loss', 'partial paresis', 'Gender', 'Age','class']]
+        X = df.drop(columns=['class'])
+        y = df['class']
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
+        num_feat = ['Age']
+        cat_feat = ['Gender', 'Polyuria', 'Polydipsia', 'sudden weight loss', 'partial paresis']
+        numeric_transformer = Pipeline(steps=[('Standard scalar', StandardScaler())])
+        categorical_transformer = Pipeline(steps=[('onehot', OneHotEncoder(handle_unknown='ignore'))])
+        col_transformer = ColumnTransformer(transformers=[('numeric_preprocess', numeric_transformer, num_feat),
+                                                          ('categorical_preprocess', categorical_transformer, cat_feat)],
+                                                          remainder='drop', n_jobs=-1)
+        if classifier == 'Random forest':
+           pipeline_rf = Pipeline([
+               ('preprocess_columns', col_transformer),
+               ('random_forest_classifier', RandomForestClassifier(criterion='entropy', random_state=0, n_jobs=-1))
+           ])
+           pipeline_rf.fit(X_train, y_train)
+           print(classification_report( pipeline_rf.predict(X_test), y_test ))
+           filename = 'model_random_forest.sav'
+           joblib.dump( pipeline_rf, filename )
+        elif classifier== 'KNN':
+            pipeline_knn = Pipeline([
+                ('preprocess_columns', col_transformer),
+                ('KNN', KNeighborsClassifier(n_neighbors=10))
+            ])
+            pipeline_knn.fit(X_train, y_train)
+            print(classification_report(pipeline_knn.predict(X_test), y_test))
+            filename = 'model_KNN.sav'
+            joblib.dump(pipeline_knn, filename)
+        elif classifier == 'SVC':
+            pipeline_svc = Pipeline([
+                ('preprocess_columns', col_transformer),
+                ('support_vectorc_classifier', SVC(gamma='auto'))
+            ])
+            pipeline_svc.fit(X_train, y_train)
+            print(classification_report(pipeline_svc.predict(X_test), y_test))
+            filename = 'model_SVC.sav'
+            joblib.dump(pipeline_svc, filename)
     else:
-        pass
+        if classifier == 'Random forest':
+            pipeline_rf = joblib.load('model_random_forest.sav')
+            df = pd.read_csv('diabetes_data.csv')
+            X = df.drop(columns=['class'])
+            y = df['class']
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
+            print(classification_report(pipeline_rf.predict(X_test), y_test))
+        elif classifier == 'KNN':
+            pipeline_knn = joblib.load('model_KNN.sav')
+            df = pd.read_csv('diabetes_data.csv')
+            X = df.drop(columns=['class'])
+            y = df['class']
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
+            print(classification_report(pipeline_knn.predict(X_test), y_test))
+        elif classifier == 'SVC':
+            pipeline_svc = joblib.load('model_SVC.sav')
+            df = pd.read_csv('diabetes_data.csv')
+            X = df.drop(columns=['class'])
+            y = df['class']
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
+            print(classification_report(pipeline_svc.predict(X_test), y_test))
+        else:
+            print('Choose a classifier to load from "Random forest", "KNN" or "SVC"')
+
 
 if __name__ == '__main__':
-    main(train=True)
-    # main()
+    main(train=True, classifier = 'SVC')
+    main(train=True, classifier='Random forest')
+    main(train=True, classifier='KNN')
+    main()
