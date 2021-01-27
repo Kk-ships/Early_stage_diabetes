@@ -3,7 +3,8 @@ import joblib
 import pandas as pd
 
 
-def write_prediction(prediction):
+def write_prediction(model, df):
+    prediction = model.predict(df)[0]
     if prediction == 'Positive':
         st.error('You have high probability of having early symptoms for diabetes. Consult a specialist '
                  'immediately.')
@@ -12,7 +13,7 @@ def write_prediction(prediction):
 
 
 def main():
-    model = st.selectbox(label='Choose machine learning model to use?', options=['Random forest', 'KNN', 'SVC'])
+    model = st.selectbox(label='Choose machine learning model to use?', options=['Random forest', 'KNN', 'SVC', 'Adaboost', 'Gradient boosting'])
     polydipsia = st.radio(label="Have you recently observed a feeling of extreme thirstiness?", options=["Yes", "No"])
     polyuria = st.radio(label="Have you been using bathroom more frequently than before?", options=["Yes", "No"])
     weight_loss = st.radio(label="Have you observed a sudden weight loss lately?", options=["Yes", "No"])
@@ -27,21 +28,29 @@ def main():
     if model == 'Random forest':
         pipeline_rf = joblib.load('model_random_forest.sav')
         if st.button('Predict'):
-            write_prediction(pipeline_rf.predict(df)[0])
-
+            write_prediction(pipeline_rf, df)
     elif model == 'KNN':
         pipeline_knn = joblib.load('model_random_forest.sav')
         if st.button('Predict'):
-            write_prediction(pipeline_knn.predict(df)[0])
+            write_prediction(pipeline_knn, df)
     elif model == 'SVC':
         pipeline_svc = joblib.load('model_SVC.sav')
         if st.button('Predict'):
-            write_prediction(pipeline_svc.predict(df)[0])
+            write_prediction(pipeline_svc, df)
+    elif model == 'Adaboost':
+        pipeline_ada = joblib.load('model_adaboost.sav')
+        if st.button('Predict'):
+            write_prediction(pipeline_ada, df)
+    elif model == 'Gradient boosting':
+        pipeline_gbc = joblib.load('model_gradient_boosting.sav')
+        if st.button('Predict'):
+            write_prediction(pipeline_gbc, df)
 
 
 if __name__ == '__main__':
     st.title('Predict early stage diabetes-mellitus.')
-    st.sidebar.markdown('Using a random forest/KNN/SVC classifier on UCI Early stage diabetes risk prediction dataset.')
+    st.sidebar.markdown('Using a random forest/KNN/SVC/Adaboost/Gradient boosting classifier'
+                        ' on UCI Early stage diabetes risk prediction dataset.')
 
     if not st.sidebar.button("About"):
         st.sidebar.text("kaustubh.shirpurkar@gmail.com ")
