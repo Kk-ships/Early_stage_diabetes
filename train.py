@@ -13,11 +13,11 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import ExtraTreesClassifier
 
 svc = 'SVC'
-rf = 'Random forest'
-KNN = 'KNN'
-adaboost = 'Adaboost'
-gboost = 'Gradient boosting'
-extra_tree = 'Extra tree'
+rf = 'Random forest classifier'
+KNN = 'KNN classifier'
+adaboost = 'Adaboost classifier'
+gboost = 'Gradient boosting classifier'
+extra_tree = 'Extra tree Classifier'
 
 def load_evaluate_model(model):
     """
@@ -26,6 +26,7 @@ def load_evaluate_model(model):
     :return: print classification report
     """
     df = pd.read_csv('diabetes_data.csv')
+    df = df[['Polydipsia', 'Polyuria', 'sudden weight loss', 'partial paresis', 'Gender', 'Age', 'class']]
     X = df.drop(columns=['class'])
     y = df['class']
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
@@ -130,10 +131,10 @@ def main(train=False, classifier=None):
 
 
 if __name__ == '__main__':
-    main(train=True, classifier=svc)
-    main(train=True, classifier=rf)
-    main(train=True, classifier=KNN)
-    main(train=True, classifier=adaboost)
-    main(train=True, classifier=gboost)
-    main(train=True, classifier=extra_tree)
+    # main(train=True, classifier=svc)
+    # main(train=True, classifier=rf)
+    # main(train=True, classifier=KNN)
+    # main(train=True, classifier=adaboost)
+    # main(train=True, classifier=gboost)
+    # main(train=True, classifier=extra_tree)
     main()

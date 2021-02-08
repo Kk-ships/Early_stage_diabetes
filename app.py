@@ -15,7 +15,7 @@ def write_prediction(model, df):
 
 def main():
     model = st.selectbox(label='Choose machine learning model to use?',
-                         options=['Random forest', 'KNN', 'SVC', 'Adaboost', 'Gradient boosting'])
+                         options=[svc, rf, KNN, adaboost, gboost, extra_tree])
     polydipsia = st.radio(label="Have you recently observed a feeling of extreme thirstiness?", options=["Yes", "No"])
     polyuria = st.radio(label="Have you been using bathroom more frequently than before?", options=["Yes", "No"])
     weight_loss = st.radio(label="Have you observed a sudden weight loss lately?", options=["Yes", "No"])
@@ -48,7 +48,7 @@ def main():
         if st.button('Predict'):
             write_prediction(pipeline_gbc, df)
     elif model == extra_tree:
-        pipeline_etc = joblib.load('model_extra_tree.sav.sav')
+        pipeline_etc = joblib.load('model_extra_tree.sav')
         if st.button('Predict'):
             write_prediction(pipeline_etc, df)
 
