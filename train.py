@@ -10,6 +10,14 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.ensemble import ExtraTreesClassifier
+
+svc = 'SVC'
+rf = 'Random forest'
+KNN = 'KNN'
+adaboost = 'Adaboost'
+gboost = 'Gradient boosting'
+extra_tree = 'Extra tree'
 
 def load_evaluate_model(model):
     """
@@ -39,7 +47,7 @@ def main(train=False, classifier=None):
                                                           (
                                                           'categorical_preprocess', categorical_transformer, cat_feat)],
                                             remainder='drop', n_jobs=-1)
-        if classifier == 'Random forest':
+        if classifier == rf:
             pipeline_rf = Pipeline([
                 ('preprocess_columns', col_transformer),
                 ('random_forest_classifier', RandomForestClassifier(criterion='entropy', random_state=0, n_jobs=-1))
@@ -48,7 +56,7 @@ def main(train=False, classifier=None):
             print(classification_report(pipeline_rf.predict(X_test), y_test))
             filename = 'model_random_forest.sav'
             joblib.dump(pipeline_rf, filename)
-        elif classifier == 'KNN':
+        elif classifier == KNN:
             pipeline_knn = Pipeline([
                 ('preprocess_columns', col_transformer),
                 ('KNN', KNeighborsClassifier(n_neighbors=10))
@@ -57,7 +65,7 @@ def main(train=False, classifier=None):
             print(classification_report(pipeline_knn.predict(X_test), y_test))
             filename = 'model_KNN.sav'
             joblib.dump(pipeline_knn, filename)
-        elif classifier == 'SVC':
+        elif classifier == svc:
             pipeline_svc = Pipeline([
                 ('preprocess_columns', col_transformer),
                 ('support_vectorc_classifier', SVC(gamma='auto'))
@@ -66,7 +74,7 @@ def main(train=False, classifier=None):
             print(classification_report(pipeline_svc.predict(X_test), y_test))
             filename = 'model_SVC.sav'
             joblib.dump(pipeline_svc, filename)
-        elif classifier == 'Adaboost':
+        elif classifier == adaboost:
             pipeline_ada = Pipeline([
                 ('preprocess_columns', col_transformer),
                 ('Adaboost_stump', AdaBoostClassifier(n_estimators=50, random_state=0))
@@ -76,40 +84,56 @@ def main(train=False, classifier=None):
             filename = 'model_adaboost.sav'
             joblib.dump(pipeline_ada, filename)
 
-        elif classifier == 'Gradient boosting':
+        elif classifier == gboost:
             pipeline_gbc = Pipeline([
                 ('preprocess_columns', col_transformer),
-                ('Adaboost_stump',
-                 GradientBoostingClassifier(n_estimators=10, learning_rate=0.1, max_depth=1, random_state=0))
+                ('Gradient_boost_classifier',
+                 GradientBoostingClassifier(n_estimators=10, learning_rate=0.1, max_depth=3, random_state=0))
             ])
             pipeline_gbc.fit(X_train, y_train)
             print(classification_report(pipeline_gbc.predict(X_test), y_test))
             filename = 'model_gradient_boosting.sav'
             joblib.dump(pipeline_gbc, filename)
+        
+        elif classifier == extra_tree:
+            pipeline_etc = Pipeline([
+                ('preprocess_columns', col_transformer),
+                ('Extra_tree_classifier',
+                 ExtraTreesClassifier(n_estimators=100, random_state=0,max_depth=3,bootstrap=True,n_jobs=-1))
+            ])
+            pipeline_etc.fit(X_train, y_train)
+            print(classification_report(pipeline_etc.predict(X_test), y_test))
+            filename = 'model_extra_tree.sav'
+            joblib.dump(pipeline_etc, filename)
     else:
-        if classifier == 'Random forest':
+        if classifier == rf:
             pipeline_rf = joblib.load('model_random_forest.sav')
             load_evaluate_model(pipeline_rf)
-        elif classifier == 'KNN':
+        elif classifier == KNN:
             pipeline_knn = joblib.load('model_KNN.sav')
             load_evaluate_model(pipeline_knn)
-        elif classifier == 'SVC':
+        elif classifier == svc:
             pipeline_svc = joblib.load('model_SVC.sav')
             load_evaluate_model(pipeline_svc)
-        elif classifier == 'Adaboost':
+        elif classifier == adaboost:
             pipeline_ada = joblib.load('model_adaboost.sav')
             load_evaluate_model(pipeline_ada)
-        elif classifier == 'Gradient boosting':
+        elif classifier == gboost:
             pipeline_gbc = joblib.load('model_gradient_boosting.sav')
             load_evaluate_model(pipeline_gbc)
+        elif classifier == extra_tree:
+            pipeline_etc = joblib.load('model_extra_tree.sav')
+            load_evaluate_model(pipeline_etc)
+
         else:
-            print('Choose a classifier to load from "Random forest", "KNN" or "SVC"')
+            print(f'Choose a classifier to load from {svc, rf, KNN,adaboost,gboost,extra_tree }')
 
 
 if __name__ == '__main__':
-    main(train=True, classifier='SVC')
-    main(train=True, classifier='Random forest')
-    main(train=True, classifier='KNN')
-    main(train=True, classifier='Adaboost')
-    main(train=True, classifier='Gradient boosting')
+    main(train=True, classifier=svc)
+    main(train=True, classifier=rf)
+    main(train=True, classifier=KNN)
+    main(train=True, classifier=adaboost)
+    main(train=True, classifier=gboost)
+    main(train=True, classifier=extra_tree)
     main()
