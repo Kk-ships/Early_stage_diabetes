@@ -2,3 +2,4 @@ venv/
 .idea/
 *.ipynb
 .jovianrc
+__pycache__/
