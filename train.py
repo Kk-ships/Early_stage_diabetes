@@ -51,14 +51,14 @@ def main(train=False, classifier=None):
         if classifier == rf:
             pipeline_rf = Pipeline([
                 ('preprocess_columns', col_transformer),
-                ('random_forest_classifier', RandomForestClassifier(bootstrap=True, ccp_alpha=0.0, class_weight=None,
-                        criterion='gini', max_depth=None, max_features='auto',
-                        max_leaf_nodes=None, max_samples=None,
-                        min_impurity_decrease=0.0, min_impurity_split=None,
-                        min_samples_leaf=1, min_samples_split=2,
-                        min_weight_fraction_leaf=0.0, n_estimators=100,
-                        n_jobs=-1, oob_score=False, random_state=42, verbose=0,
-                        warm_start=False))
+                ('random_forest_classifier', RandomForestClassifier(bootstrap=False, ccp_alpha=0.0, class_weight={},
+                       criterion='gini', max_depth=10, max_features='log2',
+                       max_leaf_nodes=None, max_samples=None,
+                       min_impurity_decrease=0.005, min_impurity_split=None,
+                       min_samples_leaf=2, min_samples_split=10,
+                       min_weight_fraction_leaf=0.0, n_estimators=180,
+                       n_jobs=-1, oob_score=False, random_state=42, verbose=0,
+                       warm_start=False))
             ])
             pipeline_rf.fit(X_train, y_train)
             print(classification_report(pipeline_rf.predict(X_test), y_test))
@@ -67,7 +67,9 @@ def main(train=False, classifier=None):
         elif classifier == KNN:
             pipeline_knn = Pipeline([
                 ('preprocess_columns', col_transformer),
-                ('KNN', KNeighborsClassifier(n_neighbors=10))
+                ('KNN', KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='euclidean',
+                     metric_params=None, n_jobs=-1, n_neighbors=11, p=2,
+                     weights='distance'))
             ])
             pipeline_knn.fit(X_train, y_train)
             print(classification_report(pipeline_knn.predict(X_test), y_test))
@@ -85,8 +87,8 @@ def main(train=False, classifier=None):
         elif classifier == adaboost:
             pipeline_ada = Pipeline([
                 ('preprocess_columns', col_transformer),
-                ('Adaboost_stump', AdaBoostClassifier(algorithm='SAMME.R', base_estimator=None, learning_rate=1.0,
-                    n_estimators=50, random_state=42))
+                ('Adaboost_stump', AdaBoostClassifier(algorithm='SAMME', base_estimator=None, learning_rate=0.399,
+                   n_estimators=250, random_state=42))
             ])
             pipeline_ada.fit(X_train, y_train)
             print(classification_report(pipeline_ada.predict(X_test), y_test))
@@ -117,14 +119,15 @@ def main(train=False, classifier=None):
             pipeline_etc = Pipeline([
                 ('preprocess_columns', col_transformer),
                 ('Extra_tree_classifier',
-                 ExtraTreesClassifier(bootstrap=False, ccp_alpha=0.0, class_weight=None,
-                                      criterion='gini', max_depth=None, max_features='auto',
+                 ExtraTreesClassifier(bootstrap=True, ccp_alpha=0.0, class_weight={},
+                                      criterion='entropy', max_depth=9, max_features='sqrt',
                                       max_leaf_nodes=None, max_samples=None,
-                                      min_impurity_decrease=0.0, min_impurity_split=None,
-                                      min_samples_leaf=1, min_samples_split=2,
-                                      min_weight_fraction_leaf=0.0, n_estimators=100, n_jobs=-1,
+                                      min_impurity_decrease=0, min_impurity_split=None,
+                                      min_samples_leaf=6, min_samples_split=10,
+                                      min_weight_fraction_leaf=0.0, n_estimators=230, n_jobs=-1,
                                       oob_score=False, random_state=42, verbose=0,
-                                      warm_start=False))
+                                      warm_start=False)
+                 )
             ])
             pipeline_etc.fit(X_train, y_train)
             print(classification_report(pipeline_etc.predict(X_test), y_test))
