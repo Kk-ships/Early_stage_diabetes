@@ -89,7 +89,16 @@ def main(train=False, classifier=None):
             pipeline_gbc = Pipeline([
                 ('preprocess_columns', col_transformer),
                 ('Gradient_boost_classifier',
-                 GradientBoostingClassifier(n_estimators=10, learning_rate=0.1, max_depth=3, random_state=0))
+                 GradientBoostingClassifier(ccp_alpha=0.0, criterion='friedman_mse', init=None,
+                                            learning_rate=0.1, loss='deviance', max_depth=3,
+                                            max_features=None, max_leaf_nodes=None,
+                                            min_impurity_decrease=0.0, min_impurity_split=None,
+                                            min_samples_leaf=1, min_samples_split=2,
+                                            min_weight_fraction_leaf=0.0, n_estimators=100,
+                                            n_iter_no_change=None,
+                                            random_state=123, subsample=1.0, tol=0.0001,
+                                            validation_fraction=0.1, verbose=0,
+                                            warm_start=False))
             ])
             pipeline_gbc.fit(X_train, y_train)
             print(classification_report(pipeline_gbc.predict(X_test), y_test))
@@ -131,10 +140,10 @@ def main(train=False, classifier=None):
 
 
 if __name__ == '__main__':
-    # main(train=True, classifier=svc)
-    # main(train=True, classifier=rf)
-    # main(train=True, classifier=KNN)
-    # main(train=True, classifier=adaboost)
-    # main(train=True, classifier=gboost)
-    # main(train=True, classifier=extra_tree)
+    main(train=True, classifier=svc)
+    main(train=True, classifier=rf)
+    main(train=True, classifier=KNN)
+    main(train=True, classifier=adaboost)
+    main(train=True, classifier=gboost)
+    main(train=True, classifier=extra_tree)
     main()
