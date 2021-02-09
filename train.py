@@ -51,7 +51,14 @@ def main(train=False, classifier=None):
         if classifier == rf:
             pipeline_rf = Pipeline([
                 ('preprocess_columns', col_transformer),
-                ('random_forest_classifier', RandomForestClassifier(criterion='entropy', random_state=0, n_jobs=-1))
+                ('random_forest_classifier', RandomForestClassifier(bootstrap=True, ccp_alpha=0.0, class_weight=None,
+                        criterion='gini', max_depth=None, max_features='auto',
+                        max_leaf_nodes=None, max_samples=None,
+                        min_impurity_decrease=0.0, min_impurity_split=None,
+                        min_samples_leaf=1, min_samples_split=2,
+                        min_weight_fraction_leaf=0.0, n_estimators=100,
+                        n_jobs=-1, oob_score=False, random_state=42, verbose=0,
+                        warm_start=False))
             ])
             pipeline_rf.fit(X_train, y_train)
             print(classification_report(pipeline_rf.predict(X_test), y_test))
@@ -78,7 +85,8 @@ def main(train=False, classifier=None):
         elif classifier == adaboost:
             pipeline_ada = Pipeline([
                 ('preprocess_columns', col_transformer),
-                ('Adaboost_stump', AdaBoostClassifier(n_estimators=50, random_state=0))
+                ('Adaboost_stump', AdaBoostClassifier(algorithm='SAMME.R', base_estimator=None, learning_rate=1.0,
+                    n_estimators=50, random_state=42))
             ])
             pipeline_ada.fit(X_train, y_train)
             print(classification_report(pipeline_ada.predict(X_test), y_test))
@@ -109,7 +117,14 @@ def main(train=False, classifier=None):
             pipeline_etc = Pipeline([
                 ('preprocess_columns', col_transformer),
                 ('Extra_tree_classifier',
-                 ExtraTreesClassifier(n_estimators=100, random_state=0,max_depth=3,bootstrap=True,n_jobs=-1))
+                 ExtraTreesClassifier(bootstrap=False, ccp_alpha=0.0, class_weight=None,
+                                      criterion='gini', max_depth=None, max_features='auto',
+                                      max_leaf_nodes=None, max_samples=None,
+                                      min_impurity_decrease=0.0, min_impurity_split=None,
+                                      min_samples_leaf=1, min_samples_split=2,
+                                      min_weight_fraction_leaf=0.0, n_estimators=100, n_jobs=-1,
+                                      oob_score=False, random_state=42, verbose=0,
+                                      warm_start=False))
             ])
             pipeline_etc.fit(X_train, y_train)
             print(classification_report(pipeline_etc.predict(X_test), y_test))
