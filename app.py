@@ -2,7 +2,7 @@ import streamlit as st
 import joblib
 import pandas as pd
 from train import svc, rf, KNN, adaboost, gboost, extra_tree
-
+from PIL import Image
 
 def write_prediction(model, df):
     prediction = model.predict(df)[0]
@@ -54,6 +54,7 @@ def main():
 
 
 if __name__ == '__main__':
+    st.image(Image.open('diabetes_image.webp'),use_column_width=True)
     st.title('Predict early stage diabetes-mellitus.')
     st.sidebar.markdown('Using a random forest/KNN/SVC/Adaboost/Gradient boosting classifier/Extra tree classifier'
                         ' on UCI Early stage diabetes risk prediction dataset.')
