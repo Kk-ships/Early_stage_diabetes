@@ -54,7 +54,7 @@ def main():
 
 
 if __name__ == '__main__':
-    st.image(Image.open('diabetes_image.webp'),use_column_width=True)
+    # st.image(Image.open('diabetes_image.webp'),use_column_width=True)
     st.title('Predict early stage diabetes-mellitus.')
     st.sidebar.markdown('Using a random forest/KNN/SVC/Adaboost/Gradient boosting classifier/Extra tree classifier'
                         ' on UCI Early stage diabetes risk prediction dataset.')
